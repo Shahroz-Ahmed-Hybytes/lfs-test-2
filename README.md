@@ -3,7 +3,7 @@ Steps to Perform
 
 
 
-<!--
+
 
 1. Configure AWS with AWS Configure command
 2. Create AWS S3 Bucket
@@ -17,4 +17,3 @@ Steps to Perform
 
  Script will execute
  
---!>
