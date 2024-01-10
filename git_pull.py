@@ -1,42 +1,46 @@
-import boto3
-import git
+#!/usr/bin/env python
+
 import os
-import shutil
+import boto3
+from botocore.exceptions import NoCredentialsError
 
-
-BUCKET_NAME = 's3testpush'
-S3_FOLDER = '/'  # Replace with the S3 folder path
-
-GITHUB_REPO_URL = 'https://github.com/Shahroz-Ahmed-Hybytes/lfs-test.git'  # Replace with your GitHub repository URL'
-CLONE_DIR = '/home/shahroz/Documents/tes_lfs_small'  # Replace with the local GitHub clone directory
-
-def pull_github_repo(repo_dir):
-    repo = git.Repo(repo_dir)
-    repo.remotes.origin.pull()
-    print(f'Pulled latest changes from GitHub repository in {repo_dir}')
-
-def download_s3_folder(s3_client, bucket_name, s3_folder, local_dir):
-    objects = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=s3_folder)
-    for obj in objects.get('Contents', []):
-        s3_key = obj['Key']
-        local_path = os.path.join(local_dir, s3_key[len(s3_folder):])
-        
-        # Create directories if they don't exist
-        local_folder = os.path.dirname(local_path)
-        if not os.path.exists(local_folder):
-            os.makedirs(local_folder)
-        
-        s3_client.download_file(bucket_name, s3_key, local_path)
-        print(f'Downloaded {s3_key} from S3 to {local_path}')
-
-if __name__ == '__main__':
-    # Use the AWS CLI configured credentials
+def download_all_folders_from_s3(bucket_name, local_base_path):
+    """
+    Download all folders and their contents from an S3 bucket to the local directory.
+    """
     s3 = boto3.client('s3')
-    
-    # Pull changes from GitHub repository
-    pull_github_repo(CLONE_DIR)
-    print('GitHub repository pulled')
-    
-    # Download AWS S3 folder
-    download_s3_folder(s3, BUCKET_NAME, S3_FOLDER, CLONE_DIR)
-    print(f'All files from S3 folder {S3_FOLDER} downloaded to {CLONE_DIR}')
+
+    try:
+        response = s3.list_objects_v2(Bucket=bucket_name)
+        objects = response.get('Contents', [])
+
+        if not objects:
+            print(f"No objects found in the S3 bucket: {bucket_name}")
+            return
+
+        for obj in objects:
+            key = obj['Key']
+
+            # Skip objects that represent folders (prefix ends with '/')
+            if key.endswith('/'):
+                continue
+
+            local_path = os.path.join(local_base_path, key)
+
+            if not os.path.exists(os.path.dirname(local_path)):
+                os.makedirs(os.path.dirname(local_path))
+
+            s3.download_file(bucket_name, key, local_path)
+            print(f"Downloaded: {key}")
+
+        print("Download completed successfully.")
+
+    except NoCredentialsError:
+        print("Credentials not available or incorrect.")
+
+if __name__ == "__main__":
+    # Specify your S3 bucket name and local base directory
+    s3_bucket_name = "s3testpush"
+    local_base_directory = os.path.dirname(os.path.abspath(__file__))
+
+    download_all_folders_from_s3(s3_bucket_name, local_base_directory)

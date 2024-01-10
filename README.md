@@ -3,7 +3,8 @@ Steps to Perform
 
 
 
-
+HOW TO EXECUTE PUSH SCENARIO FOR LARGE FILES
+File : pre_commit_hook.py
 
 1. Configure AWS with AWS Configure command
 2. Create AWS S3 Bucket
@@ -16,4 +17,15 @@ Steps to Perform
 9. git commit -m "first commit for push"
 
  Script will execute
+
+<---------------------------------------------------------------------->
+
+
+HOW TO EXECUTE PULL SCENARIO FOR LARGE FILES
+File : git_pull.py
+
+If you performed above steps of push scenario
+then you only need to run command "pyton3 git_pull.py"
+
+S3 Bucket content will be pulled and placed in the same directory where it should be or overwrite the content. 
  
