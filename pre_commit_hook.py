@@ -26,11 +26,9 @@ def track_large_files(large_files):
         logger.info(f"Tracking large file with LFS: {file_path}")
         subprocess.run(['git', 'lfs', 'track', file_path])
 
-def exclude_large_files(large_files):
-    for file_path in large_files:
-        logger.info(f"Excluding large file: {file_path}")
-        subprocess.run(['git', 'reset', 'HEAD', file_path])
-        subprocess.run(['git', 'rm', '--cached', file_path])
+def exclude_large_folder(parent_folder):
+    logger.info(f"Excluding large folder: {parent_folder}")
+    subprocess.run(['git', 'rm', '-r', '--cached', parent_folder])
 
 def push_to_s3(directory, parent_folders):
     for folder in parent_folders:
@@ -48,8 +46,9 @@ def main():
             parent_folders = {os.path.relpath(os.path.dirname(file_path), root_directory) for file_path in large_files}
             # Track large files with LFS
             track_large_files(large_files)
-            # Exclude large files from commit
-            exclude_large_files(large_files)
+            # Exclude entire folders containing large files from commit
+            for parent_folder in parent_folders:
+                exclude_large_folder(parent_folder)
             # Push each specific folder to S3
             push_to_s3(root_directory, parent_folders)
             logger.info("Large files excluded and pushed to S3.")
