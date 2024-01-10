@@ -1,9 +1,9 @@
-Steps to Perform
+# Steps to Perform
 
 
 
 
-HOW TO EXECUTE PUSH SCENARIO FOR LARGE FILES
+# HOW TO EXECUTE PUSH SCENARIO FOR LARGE FILES
 File : pre_commit_hook.py
 
 1. Configure AWS with AWS Configure command
@@ -18,14 +18,24 @@ File : pre_commit_hook.py
 
  Script will execute
 
-<---------------------------------------------------------------------->
 
 
-HOW TO EXECUTE PULL SCENARIO FOR LARGE FILES
+
+<------------------------------------------------------------------------------------------------------------>
+
+
+
+
+
+# HOW TO EXECUTE PULL SCENARIO FOR LARGE FILES
 File : git_pull.py
 
-If you performed above steps of push scenario
-then you only need to run command "pyton3 git_pull.py"
-
-S3 Bucket content will be pulled and placed in the same directory where it should be or overwrite the content. 
+1. Configure AWS with AWS Configure command
+2. There must be Content in Your AWS Bucket
+3. git init
+4. install python3, boto3 and gitpython
+5. Change Bucket name in the script :In my case its:   S3_BUCKET = "s3testpush"
+6. Execute " python3 git_pull.py"
+7. Execute " git pull origin main" 
+8. S3 Bucket content will be pulled and placed in the same directory where it should be or overwrite the content. 
  
